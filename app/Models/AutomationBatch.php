@@ -14,6 +14,11 @@ class AutomationBatch extends Model
 
     protected $fillable = [
         'store_id',
+        'automation_type',
+        'scope_type',
+        'target_product_id',
+        'target_name',
+        'auto_apply_new',
         'category_id',
         'category_name',
         'total_products',
@@ -26,6 +31,11 @@ class AutomationBatch extends Model
     public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);
+    }
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class, 'target_product_id');
     }
 
     public function jobs(): HasMany

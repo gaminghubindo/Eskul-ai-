@@ -17,7 +17,8 @@ class MarketplaceManager
         return match ($store->platform) {
             'SHOPEE' => new ShopeeAdapter(),
             'TIKTOK_SHOP' => new TikTokShopAdapter(),
-            'TOKOPEDIA' => new ShopeeAdapter(), // Tokopedia merged seller API flow
+            'TOKOPEDIA' => new TokopediaAdapter(),
+            'LAZADA' => new LazadaAdapter(),
             default => new MockMarketplaceAdapter(),
         };
     }

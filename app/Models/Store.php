@@ -19,6 +19,7 @@ class Store extends Model
         'store_name',
         'store_access_token',
         'store_refresh_token',
+        'credentials',
         'token_expires_at',
         'is_active',
     ];
@@ -31,9 +32,16 @@ class Store extends Model
         return [
             'store_access_token' => 'encrypted',
             'store_refresh_token' => 'encrypted',
+            'credentials' => 'encrypted:array',
             'token_expires_at' => 'datetime',
             'is_active' => 'boolean',
         ];
+    }
+
+    public function getCredential(string $key, mixed $default = null): mixed
+    {
+        $creds = $this->credentials ?? [];
+        return $creds[$key] ?? $default;
     }
 
     public function user(): BelongsTo

@@ -18,6 +18,13 @@ class StoreCatalogSeeder extends Seeder
                 'store_name' => 'Bintang Mode Official (Shopee)',
                 'store_access_token' => 'shopee_sec_auth_' . bin2hex(random_bytes(16)),
                 'store_refresh_token' => 'shopee_ref_auth_' . bin2hex(random_bytes(16)),
+                'credentials' => [
+                    'store_name' => 'Bintang Mode Official (Shopee)',
+                    'shop_id' => '8899120',
+                    'partner_id' => '2004567',
+                    'partner_key' => 'shp_key_demo_66778899',
+                    'access_token' => 'shp_live_act_8899aabbccddeeff',
+                ],
                 'token_expires_at' => now()->addDays(60),
                 'is_active' => true,
             ]
@@ -30,18 +37,68 @@ class StoreCatalogSeeder extends Seeder
                 'store_name' => 'Glow & Tech Viral (TikTok Shop)',
                 'store_access_token' => 'tiktok_sec_auth_' . bin2hex(random_bytes(16)),
                 'store_refresh_token' => 'tiktok_ref_auth_' . bin2hex(random_bytes(16)),
+                'credentials' => [
+                    'store_name' => 'Glow & Tech Viral (TikTok Shop)',
+                    'shop_cipher' => 'GCPO_X92K81M_DEMO',
+                    'app_key' => '6ab89c2demo',
+                    'app_secret' => 'tt_sec_demo_992244',
+                    'access_token' => 'ttp_act_demo_live_token_77',
+                ],
                 'token_expires_at' => now()->addDays(60),
                 'is_active' => true,
             ]
         );
 
-        // 3. Populate products from Mock catalog
+        // 3. Create Tokopedia Official Store
+        $tokopediaStore = Store::firstOrCreate(
+            ['platform' => 'TOKOPEDIA', 'platform_store_id' => 'OFFICIAL-1928'],
+            [
+                'store_name' => 'Berkah Gadget Official (Tokopedia)',
+                'store_access_token' => 'tkpd_sec_auth_' . bin2hex(random_bytes(16)),
+                'store_refresh_token' => 'tkpd_ref_auth_' . bin2hex(random_bytes(16)),
+                'credentials' => [
+                    'store_name' => 'Berkah Gadget Official (Tokopedia)',
+                    'shop_id' => '19283746',
+                    'fs_id' => '15520',
+                    'client_id' => 'tkpd_client_test_7788',
+                    'client_secret' => 'tkpd_sec_sandbox_9922aa88bb',
+                ],
+                'token_expires_at' => now()->addDays(60),
+                'is_active' => true,
+            ]
+        );
+
+        // 4. Create Lazada Official Store
+        $lazadaStore = Store::firstOrCreate(
+            ['platform' => 'LAZADA', 'platform_store_id' => 'OFFICIAL-5533'],
+            [
+                'store_name' => 'Metro Living Official (Lazada)',
+                'store_access_token' => 'lzd_sec_auth_' . bin2hex(random_bytes(16)),
+                'store_refresh_token' => 'lzd_ref_auth_' . bin2hex(random_bytes(16)),
+                'credentials' => [
+                    'store_name' => 'Metro Living Official (Lazada)',
+                    'seller_id' => 'ID_LZD_99182',
+                    'app_key' => '108291',
+                    'app_secret' => 'lzd_sec_test_55443322',
+                    'access_token' => '50000201a08b99cc77dd88ee11',
+                ],
+                'token_expires_at' => now()->addDays(60),
+                'is_active' => true,
+            ]
+        );
+
+        // 5. Populate products from Mock catalog across stores
         $adapter = new MockMarketplaceAdapter();
         $catalog = $adapter->getMockProductCatalog();
 
         foreach ($catalog as $index => $item) {
-            // Assign fashion & shoes to Shopee, electronics & beauty to TikTok
-            $targetStore = in_array($item['category_id'], ['cat_fashion_pria', 'cat_sepatu']) ? $shopeeStore : $tiktokStore;
+            $targetStore = match ($item['category_id']) {
+                'cat_fashion_pria' => $shopeeStore,
+                'cat_sepatu' => $shopeeStore,
+                'cat_elektronik' => $tokopediaStore,
+                'cat_kecantikan' => $tiktokStore,
+                default => $lazadaStore,
+            };
 
             // Pre-optimize first 2 items to give immediate Before-After Diff previews
             $isPreOptimized = ($index === 0 || $index === 6);

@@ -61,11 +61,20 @@ class DashboardController extends Controller
         $revertedProducts = Product::when($activeStore, fn($q) => $q->where('store_id', $activeStore->id))->where('status', 'reverted')->count();
         $successRate = $totalProducts > 0 ? round(($optimizedProducts / $totalProducts) * 100, 1) : 0;
 
-        // 5. Recent Batches
+        // 5. Recent Batches with jobs
         $recentBatches = AutomationBatch::when($activeStore, fn($q) => $q->where('store_id', $activeStore->id))
+            ->with(['jobs', 'product'])
             ->latest()
-            ->take(5)
+            ->take(15)
             ->get();
+
+        // 6. All products for active store (for single-item dropdown picker)
+        $allStoreProducts = Product::when($activeStore, fn($q) => $q->where('store_id', $activeStore->id))
+            ->select('id', 'store_id', 'external_product_id', 'category_id', 'category_name', 'original_title', 'image_urls', 'status')
+            ->orderBy('original_title')
+            ->get();
+
+        $marketplacePlatforms = config('marketplaces.platforms', []);
 
         $geminiApiKey = env('GEMINI_API_KEY', '');
         $hasGeminiKey = !empty($geminiApiKey);
@@ -75,6 +84,8 @@ class DashboardController extends Controller
             'activeStore',
             'categories',
             'products',
+            'allStoreProducts',
+            'marketplacePlatforms',
             'totalProducts',
             'optimizedProducts',
             'failedProducts',

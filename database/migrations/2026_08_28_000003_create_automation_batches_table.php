@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('processed_count')->default(0);
             $table->integer('success_count')->default(0);
             $table->integer('failed_count')->default(0);
-            $table->enum('status', ['pending', 'processing', 'completed', 'failed'])->default('pending');
+            $table->enum('status', ['pending', 'processing', 'completed', 'failed', 'cancelled', 'paused'])->default('pending');
             $table->timestamps();
 
             $table->index(['store_id', 'status']);

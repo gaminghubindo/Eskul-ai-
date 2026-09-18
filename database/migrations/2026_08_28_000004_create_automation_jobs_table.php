@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignUuid('batch_id')->constrained('automation_batches')->cascadeOnDelete();
             $table->foreignUuid('store_id')->constrained('stores')->cascadeOnDelete();
             $table->foreignUuid('product_id')->constrained('products')->cascadeOnDelete();
-            $table->enum('status', ['pending', 'processing', 'success', 'failed', 'reverted'])->default('pending');
+            $table->enum('status', ['pending', 'processing', 'success', 'failed', 'reverted', 'cancelled'])->default('pending');
             $table->smallInteger('retry_count')->default(0);
             $table->text('error_message')->nullable();
             $table->timestamp('started_at')->nullable();
